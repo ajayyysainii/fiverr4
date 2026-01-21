@@ -28,19 +28,23 @@ export async function registerRoutes(
     }
   });
 
-  const openai = new OpenAI({
+  // Primary AI: Ollama (local)
+  const ollama = process.env.OLLAMA_BASE_URL ? new OpenAI({
+    apiKey: "ollama", // Not required for local Ollama
+    baseURL: `${process.env.OLLAMA_BASE_URL}/v1`,
+  }) : null;
+
+  const ollamaModel = process.env.OLLAMA_MODEL || "gemma3:4b";
+
+  // Fallback: OpenAI (only used if Ollama is not configured)
+  const openai = process.env.AI_INTEGRATIONS_OPENAI_API_KEY ? new OpenAI({
     apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
     baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-  });
+  }) : null;
 
   const localBrain = process.env.LOCAL_AI_BRAIN_URL ? new OpenAI({
     apiKey: "local-brain",
     baseURL: `${process.env.LOCAL_AI_BRAIN_URL}/v1`,
-  }) : null;
-
-  const ollama = process.env.OLLAMA_BASE_URL ? new OpenAI({
-    apiKey: "ollama", // Usually not required for local Ollama
-    baseURL: `${process.env.OLLAMA_BASE_URL}/v1`,
   }) : null;
 
   // Protected Chat Routes
@@ -109,27 +113,41 @@ INTERACTION MODE:
           console.error("Local AI Brain error:", localError);
           aiText = "Error: Could not connect to the local AI Brain server.";
         }
-      } else if (useOllama && ollama) {
+      } else if (ollama) {
+        // Primary: Use Ollama (local LLM)
         try {
           const response = await ollama.chat.completions.create({
-            model: "llama3", // Default Ollama model, can be made configurable
+            model: ollamaModel,
             messages: messages as any,
           });
           aiText = response.choices[0].message.content || "Ollama failed to respond.";
         } catch (ollamaError) {
-          console.error("Ollama error, falling back to OpenAI:", ollamaError);
-          const response = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: messages as any,
-          });
-          aiText = response.choices[0].message.content || "I am processing your request.";
+          console.error("Ollama error:", ollamaError);
+          // Fallback to OpenAI if configured
+          if (openai) {
+            try {
+              const response = await openai.chat.completions.create({
+                model: "gpt-4o",
+                messages: messages as any,
+              });
+              aiText = response.choices[0].message.content || "I am processing your request.";
+            } catch (openaiError) {
+              console.error("OpenAI fallback also failed:", openaiError);
+              aiText = "Error: Could not connect to AI services.";
+            }
+          } else {
+            aiText = "Error: Could not connect to Ollama. Please ensure Ollama is running on your local machine.";
+          }
         }
-      } else {
+      } else if (openai) {
+        // Fallback: Use OpenAI if Ollama is not configured
         const response = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: messages as any,
         });
         aiText = response.choices[0].message.content || "I am processing your request.";
+      } else {
+        aiText = "Error: No AI service configured. Please set up Ollama or OpenAI.";
       }
 
       // 4. Save AI response
@@ -182,10 +200,21 @@ INTERACTION MODE:
         { role: "user", content: message }
       ];
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: messagesForAi as any,
-      });
+      // Use Ollama primarily, fall back to OpenAI
+      let response;
+      if (ollama) {
+        response = await ollama.chat.completions.create({
+          model: ollamaModel,
+          messages: messagesForAi as any,
+        });
+      } else if (openai) {
+        response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: messagesForAi as any,
+        });
+      } else {
+        return res.status(500).json({ error: "No AI service configured" });
+      }
 
       const aiText = response.choices[0].message.content || "I am processing your request.";
       
@@ -305,14 +334,27 @@ User request:
     if (!prompt) return res.status(400).json({ error: "No prompt provided" });
 
     try {
-      // Use the existing OpenAI instance (or Ollama if preferred, but GPT-4o is standard for high intelligence requests here)
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: SYSTEM_IDENTITY },
-          { role: "user", content: prompt }
-        ],
-      });
+      // Use Ollama primarily for AI responses
+      let response;
+      if (ollama) {
+        response = await ollama.chat.completions.create({
+          model: ollamaModel,
+          messages: [
+            { role: "system", content: SYSTEM_IDENTITY },
+            { role: "user", content: prompt }
+          ],
+        });
+      } else if (openai) {
+        response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: SYSTEM_IDENTITY },
+            { role: "user", content: prompt }
+          ],
+        });
+      } else {
+        return res.status(500).json({ error: "No AI service configured" });
+      }
 
       const aiText = response.choices[0].message.content || "No response from AI.";
       
