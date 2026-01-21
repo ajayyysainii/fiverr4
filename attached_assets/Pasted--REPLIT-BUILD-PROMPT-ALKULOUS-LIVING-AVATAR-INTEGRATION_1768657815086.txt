@@ -1,0 +1,94 @@
+🔧 REPLIT BUILD PROMPT — ALKULOUS LIVING AVATAR INTEGRATION
+📌 PROJECT CONTEXT
+We have an existing Alkulous website UI that currently displays a static image/avatar of Alkulous.
+We now have a front-facing looping video of Alkulous (head + face) that must replace the static image and act as a living AI interface.
+The video already exists and will be provided.
+🎯 OBJECTIVE
+Replace the existing static Alkulous image with a looping video avatar that:
+Appears idle (standing still, calm) when not speaking
+Animates naturally while Alkulous is talking
+Syncs mouth and eye movement to AI speech
+Integrates cleanly with the existing Alkulous chat / voice system
+Removes all legacy image-based avatar code
+This must feel professional, alive, and enterprise-grade.
+🧠 FUNCTIONAL REQUIREMENTS
+1️⃣ Avatar Replacement
+Remove the existing <img> or image-based Alkulous avatar
+Replace it with an HTML <video> element
+Video must be:
+Front-facing
+Centered
+Responsive (desktop + mobile)
+Loop-safe
+2️⃣ Idle vs Talking States
+Implement two visual states:
+🟢 IDLE STATE
+Video loops silently
+Alkulous appears attentive and calm
+No exaggerated motion
+No audio
+🔵 TALKING STATE
+When Alkulous is responding:
+Unmute or swap to speaking video
+Mouth movement must align with speech
+Eyes blink naturally
+Subtle head movement allowed
+When speech ends, return to idle loop
+3️⃣ Voice + Video Sync
+When AI audio playback starts:
+Trigger “talking” state
+When audio playback ends:
+Return to idle loop
+Do NOT restart the page
+No visual flicker
+Use JavaScript event listeners tied to:
+Audio playback
+AI response lifecycle
+4️⃣ Technical Stack Expectations
+Frontend: existing Alkulous UI (React / Vite / Next / plain JS — match current stack)
+Video handling: native HTML5 video
+State management: lightweight (no heavy animation libs unless required)
+No third-party avatar services
+5️⃣ File Structure (Example)
+/public
+  /video
+    alkulous_idle.mp4
+    alkulous_talking.mp4
+
+/components
+  AlkulousAvatar.tsx (or .jsx / .js)
+6️⃣ Example Logic (Conceptual)
+if (alkulousIsSpeaking) {
+  showTalkingVideo()
+} else {
+  showIdleVideo()
+}
+Audio events should control the avatar state.
+7️⃣ UX REQUIREMENTS
+Smooth transitions
+No lag between voice and mouth
+Works offline if server is local
+Must not block AI responses
+8️⃣ REMOVE LEGACY CODE
+Delete or disable:
+Old image avatar
+Any placeholder graphics
+Any CSS tied to static avatar positioning
+Replace references cleanly
+9️⃣ FINAL RESULT
+When complete:
+Alkulous is no longer a picture
+Alkulous appears alive
+Users feel like they are talking to an intelligence, not a chatbot
+The avatar becomes the primary interface, replacing traditional chat UI feel
+🔒 NON-NEGOTIABLE
+Do NOT change the Alkulous avatar design
+Do NOT stylize or redesign the face
+Use the provided video exactly
+No stock avatars
+No cartoon effects
+✅ DELIVERABLES
+Updated Alkulous UI with video avatar
+Clean, readable code
+Existing functionality preserved
+Old image fully removed

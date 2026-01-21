@@ -1,0 +1,93 @@
+ALKULOUS PRICING & CREDIT SYSTEM
+🔋 HOW CREDITS WORK (SIMPLE & CLEAR)
+Alkulous operates on a credit-based system
+Credits are used when customers:
+Ask questions
+Run AI agents
+Generate analysis
+Use voice or advanced intelligence
+More advanced thinking = more credits
+Credits reset monthly (or yearly if paid upfront)
+🆓 FREE PLAN — Explorer
+$0 / month
+🔹 Credits: 100 credits / month
+🔹 Access:
+Basic Alkulous intelligence
+Limited questions
+Text-only interaction
+No memory retention
+No Elite 20 agents
+🔹 Limits:
+Strict rate limits
+No priority processing
+👉 Purpose: Let users test Alkulous, not rely on it
+🟡 GOLD PLAN — Professional
+$20 / month
+or $168 / year (30% OFF – paid upfront)
+🔹 Credits: 2,500 credits / month
+🔹 Access:
+Full Alkulous core intelligence
+Faster responses
+Basic memory context
+Limited Elite 20 agent access
+🔹 Best for:
+Freelancers, solo founders, consultants
+🔵 PLATINUM PLAN — Advanced Intelligence
+$40 / month
+or $336 / year (30% OFF – paid upfront)
+🔹 Credits: 6,000 credits / month
+🔹 Access:
+Priority Alkulous processing
+Advanced reasoning mode
+Full Elite 20 agent access
+Context retention across sessions
+Higher voice interaction limits
+🔹 Best for:
+Business owners, teams, creators
+🔴 TITANIUM PLAN — Executive / Power User
+$150 / month
+or $1,260 / year (30% OFF – paid upfront)
+🔹 Credits: 25,000 credits / month
+🔹 Access:
+Maximum Alkulous intelligence depth
+Executive reasoning mode
+Unlimited Elite 20 agents
+Long-session memory
+Priority compute access
+Early access to new features
+🔹 Best for:
+Executives, investors, enterprises, family offices
+🔁 YEARLY TOGGLE (30% OFF)
+When users toggle Yearly Billing:
+They pay all upfront
+Instantly save 30%
+Credits are allocated monthly
+Priority support enabled automatically
+Example UI text:
+💡 Save 30% when billed yearly — pay once, stay uninterrupted.
+🛒 SHOPPING CART LOGIC (SIMPLE)
+User selects plan
+Chooses Monthly or Yearly (30% off)
+Checkout shows:
+Plan price
+Credit amount
+Renewal terms
+On success:
+Credits added
+Plan activated instantly
+📊 CREDIT USAGE EXAMPLE (FOR TRANSPARENCY)
+Action	Credits Used
+Simple question	5–10
+Business analysis	25–50
+Elite 20 agent task	50–150
+Long reasoning / planning	100–300
+This makes pricing feel real and fair.
+🧠 WHY THIS SYSTEM WORKS
+✅ Scales with usage
+✅ Protects server resources
+✅ Makes upgrades feel valuable
+✅ Easy to explain
+✅ Investor-friendly
+✅ Enterprise-grade logic
+🔒 IMPORTANT POSITIONING LINE (USE THIS)
+Alkulous is not unlimited chat — it is a professional intelligence system powered by compute-based credits.
