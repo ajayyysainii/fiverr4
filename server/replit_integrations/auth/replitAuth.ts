@@ -8,8 +8,13 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { authStorage } from "./storage";
 
+const isReplitEnvironment = () => !!process.env.REPL_ID;
+
 const getOidcConfig = memoize(
   async () => {
+    if (!isReplitEnvironment()) {
+      throw new Error("Replit OIDC is not available outside of Replit environment");
+    }
     return await client.discovery(
       new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
       process.env.REPL_ID!
@@ -66,6 +71,52 @@ export async function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Skip Replit OIDC setup if not on Replit platform
+  if (!isReplitEnvironment()) {
+    console.log("[Auth] Running in development mode - Replit OAuth disabled");
+    
+    passport.serializeUser((user: any, done) => {
+      done(null, { id: user.id, email: user.email });
+    });
+
+    passport.deserializeUser(async (sessionUser: any, done) => {
+      try {
+        if (sessionUser.id === "dev-user") {
+          return done(null, { 
+            id: "dev-user", 
+            email: "REEDGLOBALEQUITYTRUST@GMAIL.COM",
+            claims: { email: "REEDGLOBALEQUITYTRUST@GMAIL.COM" },
+            expires_at: Math.floor(Date.now() / 1000) + 3600 
+          });
+        }
+        const user = await authStorage.getUser(sessionUser.id);
+        if (!user) {
+          return done(null, false);
+        }
+        done(null, { ...user, ...sessionUser });
+      } catch (err) {
+        done(err);
+      }
+    });
+
+    // In development, redirect to home (use Google OAuth instead)
+    app.get("/api/login", (req, res) => {
+      res.redirect("/");
+    });
+
+    app.get("/api/callback", (req, res) => {
+      res.redirect("/");
+    });
+
+    app.get("/api/logout", (req, res) => {
+      req.logout(() => {
+        res.redirect("/");
+      });
+    });
+
+    return;
+  }
+
   const config = await getOidcConfig();
 
   const verify: VerifyFunction = async (
@@ -74,7 +125,7 @@ export async function setupAuth(app: Express) {
   ) => {
     const claims = tokens.claims();
     await upsertUser(claims);
-    const user = { id: claims["sub"] };
+    const user = { id: claims?.["sub"] };
     updateUserSession(user, tokens);
     verified(null, user);
   };
