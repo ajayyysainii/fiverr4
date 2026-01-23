@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const OLLAMA_BASE_URL = 'http://localhost:11434';
+const OLLAMA_BASE_URL = 'http://46.224.89.219:11434';
 const OLLAMA_MODEL = 'gemma3:4b';
 const CHAT_HISTORY_KEY = 'alkulous_chat_history';
 const OLLAMA_STATUS_KEY = 'alkulous_ollama_status';
@@ -97,7 +97,7 @@ export async function checkOllamaConnection(): Promise<OllamaStatus> {
     let errorMessage = 'Cannot connect to Ollama';
     
     if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-      errorMessage = 'Ollama is not running or CORS is not configured. Please start Ollama with: OLLAMA_ORIGINS=* ollama serve';
+      errorMessage = 'Cannot connect to Ollama server. Please ensure the server is running and accessible.';
     } else if (error.name === 'AbortError') {
       errorMessage = 'Connection timeout - Ollama may be slow or not running';
     }
