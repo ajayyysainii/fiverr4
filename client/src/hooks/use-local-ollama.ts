@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const OLLAMA_BASE_URL = 'http://46.224.89.219:11434';
+const OLLAMA_BASE_URL = import.meta.env.VITE_OLLAMA_BASE_URL ;
 const OLLAMA_MODEL = 'gemma3:4b';
 const CHAT_HISTORY_KEY = 'alkulous_chat_history';
 const OLLAMA_STATUS_KEY = 'alkulous_ollama_status';
