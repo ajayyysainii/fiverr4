@@ -43,14 +43,14 @@ class AuthStorage implements IAuthStorage {
     lastName: string;
     profileImageUrl: string;
   }): Promise<User> {
-    // Try to find existing user by googleId
-    const [existingUser] = await db
+    // Try to find existing user by googleId first
+    const [existingUserByGoogleId] = await db
       .select()
       .from(users)
       .where(eq(users.googleId, userData.googleId));
 
-    if (existingUser) {
-      // Update existing user
+    if (existingUserByGoogleId) {
+      // Update existing user found by googleId
       const [updatedUser] = await db
         .update(users)
         .set({
@@ -61,6 +61,28 @@ class AuthStorage implements IAuthStorage {
           updatedAt: new Date(),
         })
         .where(eq(users.googleId, userData.googleId))
+        .returning();
+      return updatedUser;
+    }
+
+    // Check if user exists with the same email (may have signed up differently before)
+    const [existingUserByEmail] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, userData.email));
+
+    if (existingUserByEmail) {
+      // Link existing email user with Google account
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          googleId: userData.googleId,
+          firstName: userData.firstName || existingUserByEmail.firstName,
+          lastName: userData.lastName || existingUserByEmail.lastName,
+          profileImageUrl: userData.profileImageUrl || existingUserByEmail.profileImageUrl,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.email, userData.email))
         .returning();
       return updatedUser;
     }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { motion } from "framer-motion";
-import { Check, Zap, Shield, Cpu, Activity, Database, ArrowRight, ShoppingCart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, Zap, Shield, Cpu, Activity, Database, ArrowRight, ShoppingCart, Menu, X } from "lucide-react";
 import { CyberButton } from "@/components/CyberButton";
 import { useAuth } from "@/hooks/use-auth";
 import landingBg from "@assets/generated_images/cyberpunk_lab_background_without_people.png";
@@ -13,6 +13,7 @@ export default function Landing() {
   const [, setLocation] = useLocation();
   const { user, isAuthenticated } = useAuth();
   const [isYearly, setIsYearly] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
 
   const addToCartMutation = useMutation({
@@ -124,12 +125,16 @@ export default function Landing() {
       <div className="fixed inset-0 pointer-events-none z-50 opacity-10 scanline" />
 
       {/* Header */}
-      <header className="fixed top-0 w-full p-6 flex justify-between items-center z-50 border-b border-primary/20 bg-black/80 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <Zap className="text-primary animate-pulse" />
-          <h1 className="text-xl tracking-[0.5em]">ALKULOUS <span className="text-primary text-xs">SYS.AI.01</span></h1>
+      <header className="fixed top-0 w-full px-4 py-4 md:px-6 md:py-6 flex justify-between items-center z-50 border-b border-primary/20 bg-black/80 backdrop-blur-md">
+        <div className="flex items-center gap-2 md:gap-3">
+          <Zap className="text-primary animate-pulse w-5 h-5 md:w-6 md:h-6" />
+          <h1 className="text-sm md:text-xl tracking-[0.3em] md:tracking-[0.5em]">
+            ALKULOUS <span className="text-primary text-[8px] md:text-xs hidden sm:inline">SYS.AI.01</span>
+          </h1>
         </div>
-        <nav className="flex items-center gap-6">
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-6">
           <Link href="/cart" asChild>
             <a className="relative text-xs hover:text-primary transition-colors flex items-center gap-2">
               <ShoppingCart className="w-4 h-4" />
@@ -156,7 +161,141 @@ export default function Landing() {
             </CyberButton>
           )}
         </nav>
+
+        {/* Mobile Menu Button */}
+        <div className="flex md:hidden items-center gap-3">
+          <Link href="/cart" asChild>
+            <a className="relative text-xs hover:text-primary transition-colors flex items-center">
+              <ShoppingCart className="w-5 h-5" />
+              {cartItems && cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-black text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {cartItems.length}
+                </span>
+              )}
+            </a>
+          </Link>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="text-white hover:text-primary transition-colors p-1"
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Mobile Menu Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-72 bg-black/95 border-l border-primary/20 z-50 md:hidden backdrop-blur-md"
+            >
+              <div className="flex flex-col h-full pt-20 px-6">
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="absolute top-4 right-4 text-white hover:text-primary transition-colors p-2"
+                  aria-label="Close menu"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+
+                {/* User Info */}
+                {isAuthenticated && (
+                  <div className="mb-6 pb-6 border-b border-primary/20">
+                    <span className="text-[10px] text-primary/60 uppercase tracking-widest block mb-2">
+                      ARCHITECT
+                    </span>
+                    <span className="text-sm text-white">
+                      {user?.email?.split('@')[0]}
+                    </span>
+                  </div>
+                )}
+
+                {/* Navigation Links */}
+                <nav className="flex flex-col gap-4 flex-1">
+                  <Link href="/cart" asChild>
+                    <a
+                      className="flex items-center gap-3 text-sm hover:text-primary transition-colors py-3 border-b border-white/5"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      CART
+                      {cartItems && cartItems.length > 0 && (
+                        <span className="bg-primary text-black text-[10px] px-2 py-0.5 rounded-full font-bold ml-auto">
+                          {cartItems.length}
+                        </span>
+                      )}
+                    </a>
+                  </Link>
+
+                  {isAuthenticated && (
+                    <Link href="/console" asChild>
+                      <a
+                        className="flex items-center gap-3 text-sm hover:text-primary transition-colors py-3 border-b border-white/5"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Cpu className="w-5 h-5" />
+                        CONSOLE
+                      </a>
+                    </Link>
+                  )}
+                </nav>
+
+                {/* Auth Button */}
+                <div className="py-6 border-t border-primary/20">
+                  {isAuthenticated ? (
+                    <CyberButton
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        window.location.href = '/api/logout';
+                      }}
+                    >
+                      LOGOUT
+                    </CyberButton>
+                  ) : (
+                    <CyberButton
+                      variant="primary"
+                      className="w-full"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        window.location.href = '/api/login';
+                      }}
+                    >
+                      LOGIN
+                    </CyberButton>
+                  )}
+                </div>
+
+                {/* System Info */}
+                <div className="py-4 text-center">
+                  <span className="text-[8px] text-primary/40 tracking-widest">
+                    SYS.AI.01 // MOBILE INTERFACE
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Hero Section */}
       <main className="relative z-10 pt-32 pb-20 px-4">

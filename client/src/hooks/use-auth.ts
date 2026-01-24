@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@shared/models/auth";
 
+// List of admin email addresses
+const ADMIN_EMAILS = [
+  "andrereed0410@gmail.com",
+  "Itwts.records@gmail.com",
+  "ajaysaini2003@gmail.com",
+];
+
 async function fetchUser(): Promise<User | null> {
   const response = await fetch("/api/auth/user", {
     credentials: "include",
@@ -37,11 +44,18 @@ export function useAuth() {
     },
   });
 
+  // Check if user email is in the admin list (case-insensitive)
+  const isAdmin = user?.email 
+    ? ADMIN_EMAILS.some(email => email.toLowerCase() === user.email!.toLowerCase())
+    : false;
+
   return {
     user,
     isLoading,
     isAuthenticated: !!user,
+    isAdmin,
     logout: logoutMutation.mutate,
     isLoggingOut: logoutMutation.isPending,
   };
 }
+
